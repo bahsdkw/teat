@@ -4,86 +4,152 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Калькулятор</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #1a1a2e;
-    --panel: #16213e;
-    --display-bg: #0f3460;
-    --accent: #e94560;
-    --btn-bg: #22314f;
-    --btn-hover: #2d3f66;
-    --text: #f1f1f1;
-    --muted: #9aa5c9;
-  }
   * { box-sizing: border-box; }
-  body {
+
+  :root {
+    --bg: #0b0b0d;
+    --panel: #161618;
+    --panel-border: rgba(255,255,255,0.06);
+    --text: #f2f2f3;
+    --muted: rgba(242,242,243,0.42);
+    --accent: #d8b568;
+    --accent-dim: rgba(216,181,104,0.14);
+    --btn-bg: #1f1f22;
+    --btn-hover: #26262a;
+    --btn-active: #1a1a1d;
+  }
+
+  html, body {
+    height: 100%;
     margin: 0;
-    min-height: 100vh;
+  }
+
+  body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg);
-    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
     color: var(--text);
+    background:
+      radial-gradient(ellipse 900px 600px at 50% 0%, rgba(255,255,255,0.035), transparent 60%),
+      var(--bg);
   }
+
   .calculator {
-    background: var(--panel);
-    border-radius: 20px;
-    padding: 20px;
     width: 320px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    padding: 22px;
+    border-radius: 24px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.04) inset,
+      0 30px 60px -20px rgba(0,0,0,0.7),
+      0 10px 20px -10px rgba(0,0,0,0.5);
   }
+
+  .title {
+    text-align: center;
+    margin: 2px 0 18px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
   .display {
-    background: var(--display-bg);
-    border-radius: 12px;
-    padding: 20px 16px;
+    border-radius: 14px;
+    padding: 22px 16px 16px;
     margin-bottom: 16px;
     text-align: right;
-    overflow: hidden;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.04);
   }
   .display .prev {
     color: var(--muted);
-    font-size: 1rem;
+    font-size: 0.95rem;
+    font-weight: 400;
     min-height: 1.2rem;
     word-break: break-all;
   }
   .display .curr {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 600;
+    color: var(--text);
     word-break: break-all;
+    letter-spacing: -0.5px;
   }
+
   .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
   }
+
   button {
-    border: none;
+    border: 1px solid rgba(255,255,255,0.05);
     border-radius: 12px;
     background: var(--btn-bg);
     color: var(--text);
-    font-size: 1.1rem;
-    padding: 18px 0;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 17px 0;
     cursor: pointer;
-    transition: background 0.15s ease, transform 0.05s ease;
+    transition: background-color 0.15s ease, transform 0.06s ease, border-color 0.15s ease;
   }
-  button:hover { background: var(--btn-hover); }
-  button:active { transform: scale(0.96); }
-  button.operator { background: var(--accent); color: #fff; }
-  button.operator:hover { background: #ff5773; }
+  button:hover {
+    background: var(--btn-hover);
+    border-color: rgba(255,255,255,0.09);
+  }
+  button:active {
+    background: var(--btn-active);
+    transform: scale(0.97);
+  }
+
+  button.func {
+    color: var(--muted);
+    background: transparent;
+  }
+  button.func:hover {
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+
+  button.operator {
+    color: var(--accent);
+    background: var(--accent-dim);
+    border-color: rgba(216,181,104,0.18);
+  }
+  button.operator:hover {
+    background: rgba(216,181,104,0.22);
+  }
+
   button.equals {
-    background: var(--accent);
-    color: #fff;
     grid-column: span 2;
+    background: var(--accent);
+    color: #1a140a;
+    font-weight: 700;
+    border: none;
   }
-  button.equals:hover { background: #ff5773; }
+  button.equals:hover {
+    background: #e2c27c;
+  }
+  button.equals:active {
+    background: #cba756;
+  }
+
   button.span2 { grid-column: span 2; }
-  button.func { color: var(--muted); }
 </style>
 </head>
 <body>
 
 <div class="calculator">
+  <p class="title">Калькулятор</p>
   <div class="display">
     <div class="prev" id="prev"></div>
     <div class="curr" id="curr">0</div>
