@@ -5,85 +5,176 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Калькулятор</title>
 <style>
-  :root {
-    --bg: #1a1a2e;
-    --panel: #16213e;
-    --display-bg: #0f3460;
-    --accent: #e94560;
-    --btn-bg: #22314f;
-    --btn-hover: #2d3f66;
-    --text: #f1f1f1;
-    --muted: #9aa5c9;
-  }
   * { box-sizing: border-box; }
+
+  :root {
+    --glass: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.18);
+    --text: #f5f6ff;
+    --muted: rgba(245,246,255,0.55);
+    --neon1: #ff2ec4;
+    --neon2: #7c4dff;
+    --neon3: #22e0ff;
+  }
+
   body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg);
     font-family: 'Segoe UI', Roboto, Arial, sans-serif;
     color: var(--text);
-  }
-  .calculator {
-    background: var(--panel);
-    border-radius: 20px;
-    padding: 20px;
-    width: 320px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  }
-  .display {
-    background: var(--display-bg);
-    border-radius: 12px;
-    padding: 20px 16px;
-    margin-bottom: 16px;
-    text-align: right;
+    background: radial-gradient(circle at 20% 20%, #2b0b40 0%, #0a0a1a 55%),
+                radial-gradient(circle at 80% 80%, #001a2e 0%, #0a0a1a 60%),
+                #05050c;
     overflow: hidden;
+    position: relative;
+  }
+
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    z-index: 0;
+    animation: float 12s ease-in-out infinite;
+  }
+  .blob1 { width: 380px; height: 380px; background: var(--neon1); top: -100px; left: -100px; }
+  .blob2 { width: 420px; height: 420px; background: var(--neon2); bottom: -140px; right: -120px; animation-delay: -4s; }
+  .blob3 { width: 300px; height: 300px; background: var(--neon3); bottom: 10%; left: 15%; animation-delay: -8s; }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -40px) scale(1.1); }
+  }
+
+  .calculator {
+    position: relative;
+    z-index: 1;
+    width: 340px;
+    padding: 22px;
+    border-radius: 26px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow:
+      0 25px 60px rgba(0,0,0,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.15),
+      0 0 60px rgba(124,77,255,0.25);
+  }
+
+  .display {
+    border-radius: 16px;
+    padding: 24px 18px 18px;
+    margin-bottom: 18px;
+    text-align: right;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 2px 12px rgba(0,0,0,0.5);
   }
   .display .prev {
     color: var(--muted);
     font-size: 1rem;
-    min-height: 1.2rem;
+    min-height: 1.3rem;
     word-break: break-all;
+    letter-spacing: 0.5px;
   }
   .display .curr {
-    font-size: 2.2rem;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: 700;
     word-break: break-all;
+    background: linear-gradient(90deg, var(--neon3), var(--neon2) 50%, var(--neon1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 30px rgba(124,77,255,0.35);
   }
+
   .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 12px;
   }
+
   button {
-    border: none;
-    border-radius: 12px;
-    background: var(--btn-bg);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
     color: var(--text);
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    font-weight: 500;
     padding: 18px 0;
     cursor: pointer;
-    transition: background 0.15s ease, transform 0.05s ease;
+    transition: transform 0.08s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
-  button:hover { background: var(--btn-hover); }
-  button:active { transform: scale(0.96); }
-  button.operator { background: var(--accent); color: #fff; }
-  button.operator:hover { background: #ff5773; }
-  button.equals {
-    background: var(--accent);
+  button:hover {
+    background: rgba(255,255,255,0.14);
+    box-shadow: 0 0 18px rgba(124,77,255,0.35);
+  }
+  button:active { transform: scale(0.94); }
+
+  button.func {
+    color: var(--neon3);
+    border-color: rgba(34,224,255,0.35);
+  }
+  button.operator {
+    background: linear-gradient(135deg, var(--neon2), var(--neon1));
     color: #fff;
-    grid-column: span 2;
+    border: none;
+    box-shadow: 0 6px 18px rgba(255,46,196,0.35);
   }
-  button.equals:hover { background: #ff5773; }
+  button.operator:hover {
+    box-shadow: 0 6px 26px rgba(255,46,196,0.55);
+    filter: brightness(1.1);
+  }
+  button.equals {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--neon3), var(--neon2));
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    box-shadow: 0 6px 22px rgba(34,224,255,0.4);
+  }
+  button.equals:hover {
+    box-shadow: 0 6px 30px rgba(34,224,255,0.6);
+    filter: brightness(1.1);
+  }
   button.span2 { grid-column: span 2; }
-  button.func { color: var(--muted); }
+
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    transform: scale(0);
+    animation: ripple 0.5s ease-out;
+    pointer-events: none;
+  }
+  @keyframes ripple {
+    to { transform: scale(3); opacity: 0; }
+  }
+
+  .title {
+    text-align: center;
+    margin: 0 0 16px;
+    font-size: 0.85rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 </style>
 </head>
 <body>
 
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
 <div class="calculator">
+  <p class="title">Калькулятор</p>
   <div class="display">
     <div class="prev" id="prev"></div>
     <div class="curr" id="curr">0</div>
@@ -204,9 +295,23 @@
     current = String(round(parseFloat(current) / 100));
   }
 
+  function spawnRipple(btn, e) {
+    const rect = btn.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    const size = Math.max(rect.width, rect.height);
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  }
+
   document.querySelector('.buttons').addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
+
+    spawnRipple(btn, e);
 
     if (btn.dataset.num !== undefined) {
       inputNum(btn.dataset.num);
