@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --panel: #16213e;
+    --display-bg: #0f3460;
+    --accent: #e94560;
+    --btn-bg: #22314f;
+    --btn-hover: #2d3f66;
+    --text: #f1f1f1;
+    --muted: #9aa5c9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--text);
+  }
+  .calculator {
+    background: var(--panel);
+    border-radius: 20px;
+    padding: 20px;
+    width: 320px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .display {
+    background: var(--display-bg);
+    border-radius: 12px;
+    padding: 20px 16px;
+    margin-bottom: 16px;
+    text-align: right;
+    overflow: hidden;
+  }
+  .display .prev {
+    color: var(--muted);
+    font-size: 1rem;
+    min-height: 1.2rem;
+    word-break: break-all;
+  }
+  .display .curr {
+    font-size: 2.2rem;
+    font-weight: 600;
+    word-break: break-all;
+  }
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  button {
+    border: none;
+    border-radius: 12px;
+    background: var(--btn-bg);
+    color: var(--text);
+    font-size: 1.1rem;
+    padding: 18px 0;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.05s ease;
+  }
+  button:hover { background: var(--btn-hover); }
+  button:active { transform: scale(0.96); }
+  button.operator { background: var(--accent); color: #fff; }
+  button.operator:hover { background: #ff5773; }
+  button.equals {
+    background: var(--accent);
+    color: #fff;
+    grid-column: span 2;
+  }
+  button.equals:hover { background: #ff5773; }
+  button.span2 { grid-column: span 2; }
+  button.func { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+  <div class="display">
+    <div class="prev" id="prev"></div>
+    <div class="curr" id="curr">0</div>
+  </div>
+  <div class="buttons">
+    <button class="func" data-action="clear">C</button>
+    <button class="func" data-action="delete">⌫</button>
+    <button class="func" data-action="percent">%</button>
+    <button class="operator" data-action="divide">÷</button>
+
+    <button data-num="7">7</button>
+    <button data-num="8">8</button>
+    <button data-num="9">9</button>
+    <button class="operator" data-action="multiply">×</button>
+
+    <button data-num="4">4</button>
+    <button data-num="5">5</button>
+    <button data-num="6">6</button>
+    <button class="operator" data-action="subtract">−</button>
+
+    <button data-num="1">1</button>
+    <button data-num="2">2</button>
+    <button data-num="3">3</button>
+    <button class="operator" data-action="add">+</button>
+
+    <button class="span2" data-num="0">0</button>
+    <button data-num=".">.</button>
+    <button class="equals" data-action="equals">=</button>
+  </div>
+</div>
+
+<script>
+  const prevEl = document.getElementById('prev');
+  const currEl = document.getElementById('curr');
+
+  let current = '0';
+  let previous = null;
+  let operator = null;
+  let overwrite = true;
+
+  const opSymbol = { add: '+', subtract: '−', multiply: '×', divide: '÷' };
+
+  function updateDisplay() {
+    currEl.textContent = current;
+    prevEl.textContent = previous !== null && operator
+      ? `${formatNum(previous)} ${opSymbol[operator]}`
+      : '';
+  }
+
+  function formatNum(n) {
+    const num = parseFloat(n);
+    if (Number.isNaN(num)) return '0';
+    return num.toLocaleString('ru-RU', { maximumFractionDigits: 10 });
+  }
+
+  function inputNum(digit) {
+    if (overwrite) {
+      current = digit === '.' ? '0.' : digit;
+      overwrite = false;
+      return;
+    }
+    if (digit === '.' && current.includes('.')) return;
+    if (current === '0' && digit !== '.') current = digit;
+    else current += digit;
+  }
+
+  function compute() {
+    const a = parseFloat(previous);
+    const b = parseFloat(current);
+    if (Number.isNaN(a) || Number.isNaN(b)) return b;
+    switch (operator) {
+      case 'add': return a + b;
+      case 'subtract': return a - b;
+      case 'multiply': return a * b;
+      case 'divide': return b === 0 ? NaN : a / b;
+      default: return b;
+    }
+  }
+
+  function setOperator(op) {
+    if (operator && !overwrite) {
+      previous = compute();
+      current = String(previous);
+    } else {
+      previous = current;
+    }
+    operator = op;
+    overwrite = true;
+  }
+
+  function equals() {
+    if (operator === null) return;
+    const result = compute();
+    current = Number.isNaN(result) ? 'Ошибка' : String(round(result));
+    previous = null;
+    operator = null;
+    overwrite = true;
+  }
+
+  function round(n) {
+    return Math.round((n + Number.EPSILON) * 1e10) / 1e10;
+  }
+
+  function clearAll() {
+    current = '0';
+    previous = null;
+    operator = null;
+    overwrite = true;
+  }
+
+  function deleteLast() {
+    if (overwrite) return;
+    current = current.slice(0, -1);
+    if (current === '' || current === '-') current = '0';
+  }
+
+  function percent() {
+    current = String(round(parseFloat(current) / 100));
+  }
+
+  document.querySelector('.buttons').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    if (btn.dataset.num !== undefined) {
+      inputNum(btn.dataset.num);
+    } else if (btn.dataset.action) {
+      switch (btn.dataset.action) {
+        case 'clear': clearAll(); break;
+        case 'delete': deleteLast(); break;
+        case 'percent': percent(); break;
+        case 'equals': equals(); break;
+        default: setOperator(btn.dataset.action);
+      }
+    }
+    updateDisplay();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key >= '0' && e.key <= '9') inputNum(e.key);
+    else if (e.key === '.') inputNum('.');
+    else if (e.key === '+') setOperator('add');
+    else if (e.key === '-') setOperator('subtract');
+    else if (e.key === '*') setOperator('multiply');
+    else if (e.key === '/') { e.preventDefault(); setOperator('divide'); }
+    else if (e.key === 'Enter' || e.key === '=') equals();
+    else if (e.key === 'Backspace') deleteLast();
+    else if (e.key === 'Escape') clearAll();
+    else return;
+    updateDisplay();
+  });
+
+  updateDisplay();
+</script>
+
+</body>
+</html>
